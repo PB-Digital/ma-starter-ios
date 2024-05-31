@@ -50,19 +50,27 @@ open class UIBaseViewController<State, Effect, VM: BaseViewModel<State, Effect>>
         
         self.setText()
 
-        let baseEffectSubscription = self.viewModel.observeBaseEffect().sink { effect in
+        let baseEffectSubscription = self.viewModel.observeBaseEffect()
+            .receive(on: DispatchQueue.main)
+            .sink { effect in
             self.observe(baseEffect: effect)
         }
         
-        let effectSubscription = self.viewModel.observeEffect().sink { effect in
+        let effectSubscription = self.viewModel.observeEffect()
+            .receive(on: DispatchQueue.main)
+            .sink { effect in
             self.observe(effect: effect)
         }
 
-        let stateSubscription = self.viewModel.observeState().sink { state in
+        let stateSubscription = self.viewModel.observeState()
+            .receive(on: DispatchQueue.main)
+            .sink { state in
             self.observe(state: state)
         }
 
-        let loadingSubscription = self.viewModel.observeLoading().sink { isLoading in
+        let loadingSubscription = self.viewModel.observeLoading()
+            .receive(on: DispatchQueue.main)
+            .sink { isLoading in
             if isLoading {
                 self.startAnimating()
             } else {
