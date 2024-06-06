@@ -30,7 +30,9 @@ class CardRepo: CardRepoProtocol {
             by: customerLocalDataSource.getCustomerID()
         ).map { $0.toLocal() }
 
-        try await self.localDataSource.save(cards: card)
+        Task { @MainActor [card] in
+            try self.localDataSource.save(cards: card)
+        }
     }
     
     func observeCards() -> AnyPublisher<[Card], Never> {

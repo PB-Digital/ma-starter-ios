@@ -10,5 +10,5 @@ import Combine
 
 protocol CardLocalDataSourceProtocol {
     func observeCards() -> AnyPublisher<[CardLocalDTO], Never>
-    func save(cards: [CardLocalDTO]) async throws
+    func save(cards: [CardLocalDTO]) throws
 }

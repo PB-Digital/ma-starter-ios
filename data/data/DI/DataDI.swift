@@ -56,7 +56,7 @@ public class DataAssembly: Assembly {
         // MARK: - Data sources
 
         container.register(RealmClientProtocol.self) { r in
-            runBlocking { await RealmClient() }
+            RealmClient()
         }.inObjectScope(.container)
 
         container.register(LocalDataStorage.self) { r in

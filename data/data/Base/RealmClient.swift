@@ -11,7 +11,7 @@ import Realm
 import domain
 
 
-protocol RealmClientProtocol: Actor {
+protocol RealmClientProtocol {
     func find<T: Object, PK: CVarArg>(pk: PK) -> T?
 
     func read<T: Object>() -> [T]
@@ -32,14 +32,13 @@ protocol RealmClientProtocol: Actor {
     func replace<T: Object>(objects: some Sequence<T>) throws
 }
 
-final actor RealmClient: RealmClientProtocol {
+class RealmClient: RealmClientProtocol {
     private var tokens: Set<NotificationToken> = .init()
     private var realm: Realm!
 
-    init() async {
-        self.realm = try! await Realm(
-            configuration: .init(deleteRealmIfMigrationNeeded: true),
-            actor: self
+    init() {
+        self.realm = try! Realm(
+            configuration: .init(deleteRealmIfMigrationNeeded: true)
         )
     }
 

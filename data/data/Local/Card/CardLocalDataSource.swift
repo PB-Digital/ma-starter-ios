@@ -17,21 +17,19 @@ class CardLocalDataSource: CardLocalDataSourceProtocol {
     
     init(realmClient: RealmClientProtocol) {
         self.realmClient = realmClient
-        Task {
-            await self.syncCards()
-        }
+        self.syncCards()
     }
     
-    private func syncCards() async {
-        self.cardsSubject.send(await self.realmClient.read().freeze())
+    private func syncCards() {
+        self.cardsSubject.send(self.realmClient.read().freeze())
     }
     
     func observeCards() -> AnyPublisher<[CardLocalDTO], Never> {
         return self.cardsSubject.eraseToAnyPublisher()
     }
     
-    func save(cards: [CardLocalDTO]) async throws {
-        try await self.realmClient.replace(objects: cards)
-        await self.syncCards()
+    func save(cards: [CardLocalDTO]) throws {
+        try self.realmClient.replace(objects: cards)
+        self.syncCards()
     }
 }

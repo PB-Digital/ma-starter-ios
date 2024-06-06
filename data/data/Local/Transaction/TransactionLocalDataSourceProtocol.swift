@@ -10,6 +10,6 @@ import Combine
 
 protocol TransactionLocalDataSourceProtocol {
     func observeTransactions(cardId: String) -> AnyPublisher<[TransactionLocalDTO], Never>
-    func save(cardId: String, transactions: [TransactionLocalDTO]) async throws
+    func save(cardId: String, transactions: [TransactionLocalDTO]) throws
 }
 

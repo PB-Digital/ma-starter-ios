@@ -26,8 +26,10 @@ class CustomerRepo: CustomerRepoProtocol {
         let customer = try await self.remoteDataSource.getCustomer(
             by: self.localDataSource.getCustomerID()
         ).toLocal()
-
-        self.localDataSource.save(customer: customer)
+        
+        Task { @MainActor [customer] in
+            self.localDataSource.save(customer: customer)
+        }
     }
     
     func observeCustomer() -> AnyPublisher<Customer, Never> {

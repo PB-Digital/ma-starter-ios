@@ -21,8 +21,8 @@ class TransactionLocalDataSource: TransactionLocalDataSourceProtocol {
         self.realmClient = realmClient
     }
     
-    private func getTransactionHistory(cardId: String) async -> [TransactionLocalDTO] {
-        await self.realmClient.read { transaction in
+    private func getTransactionHistory(cardId: String) -> [TransactionLocalDTO] {
+        self.realmClient.read { transaction in
             transaction.cardId == cardId
         }
         .freeze()
@@ -34,15 +34,15 @@ class TransactionLocalDataSource: TransactionLocalDataSourceProtocol {
             return observable
         }
         let subject: CurrentValueSubject<[TransactionLocalDTO], Never> = .init([])
-        Task {
-            subject.send(await self.getTransactionHistory(cardId: cardId))
+        Task { @MainActor [cardId] in
+            subject.send(self.getTransactionHistory(cardId: cardId))
         }
         self.transactionSubjectMap[cardId] = subject
         return subject.eraseToAnyPublisher()
     }
     
-    func save(cardId: String, transactions: [TransactionLocalDTO]) async throws {
-        try await self.realmClient.replace(objects: transactions) { transaction in
+    func save(cardId: String, transactions: [TransactionLocalDTO]) throws {
+        try self.realmClient.replace(objects: transactions) { transaction in
             transaction.cardId == cardId
         }
 
@@ -53,8 +53,6 @@ class TransactionLocalDataSource: TransactionLocalDataSourceProtocol {
     
     private func syncTransactionHistory(cardId: String) {
         guard let subject = self.transactionSubjectMap[cardId] else { return }
-        Task {
-            subject.send(await self.getTransactionHistory(cardId: cardId))
-        }
+        subject.send(self.getTransactionHistory(cardId: cardId))
     }
 }

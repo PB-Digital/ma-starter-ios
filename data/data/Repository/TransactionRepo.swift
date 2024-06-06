@@ -31,7 +31,9 @@ class TransactionRepo: TransactionRepoProtocol {
             of: card.id
         ).map { $0.toLocal(cardId: card.id) }
 
-        try await self.localDataSource.save(cardId: card.id, transactions: transactions)
+        Task { @MainActor [transactions] in
+            try self.localDataSource.save(cardId: card.id, transactions: transactions)
+        }
     }
     
     func observeTransactions(of card: Card) -> AnyPublisher<[Transaction], Never> {
